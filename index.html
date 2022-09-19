@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetGuard pro</title>
+  <style>
+    * {
+      font-size: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    input,
+    button,
+    center {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    article {
+      margin: 0 auto;
+      width: 80%;
+    }
+
+    article>div>div:first-child {
+      float: left
+    }
+
+    article>div>div:last-child {
+      float: right
+    }
+
+    @media(max-width:480px) {
+      article>div>div {
+        float: none !important;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+    integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+
+<body>
+  <article>
+    <center>Paste your request hash here:</center><br>
+    <input id="hash" type="text"><br>
+    <button id="calc">calculate</button>
+
+    <center><br>try the following hashes:<br></center>
+
+    <div>
+      <div id="q2">
+        <input id="hashv2"><br>
+      </div>
+      <div id="q3">
+        <input id="hashv3">
+      </div>
+    </div>
+  </article>
+  <script>
+    document.getElementById("calc").addEventListener("click", (e) => {
+      e.preventDefault();
+      const hash = document.getElementById("hash").value
+      const hashv2 = CryptoJS.MD5(hash + "NetGuard3").toString();
+      const hashv3 = CryptoJS.MD5(hash + "NetGuard2").toString();
+      document.getElementById("hashv2").value = hashv2
+      document.getElementById("hashv3").value = hashv3
+      new QRCode(document.getElementById("q2"), {
+        text: hashv2,
+        width: 256,
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      new QRCode(document.getElementById("q3"), {
+        text: hashv3,
+        width: 256,
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    })
+  </script>
+</body>
+
+</html>
