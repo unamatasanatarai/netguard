@@ -68,28 +68,11 @@
       font-weight: 600;
     }
 
-    .header {
-      margin-bottom: 30px;
-    }
-
-    .header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .header p {
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
     .input-row {
       display: flex;
       flex-direction: row;
       align-items: stretch;
       gap: 0;
-      margin-bottom: 35px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
     }
@@ -157,7 +140,8 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 0;
-      padding: 0 0 24px;
+      margin: 24px 0 0px;
+      padding-bottom: 24px;
       position: relative;
       box-shadow: var(--shadow);
     }
@@ -254,6 +238,7 @@
     @media (max-width: 640px) {
       .results {
         flex-direction: column;
+        gap: 0;
       }
     }
   </style>
@@ -263,12 +248,8 @@
 
   <div class="container">
     <div class="card">
-      <div class="app-label">NetGuard Pro</div>
+      <div class="app-label">NetGuard Pro - Key Generator</div>
 
-      <div class="header">
-        <h1>Key Generator</h1>
-        <p>Enter your challenge code to generate authentication keys.</p>
-      </div>
 
       <div class="input-row">
         <input type="text" id="hash" placeholder="Enter request hash (e.g. 784019874562340ghjsfdk)" autocomplete="off">
