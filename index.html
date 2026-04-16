@@ -1,94 +1,378 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NetGuard pro</title>
+  <title>NetGuard Pro</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --soft: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-text: #ffffff;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    }
+
     * {
-      font-size: 20px;
-      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    input,
-    button,
-    center {
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      max-width: 800px;
+      padding: 20px;
     }
 
-    article {
-      margin: 0 auto;
-      width: 80%;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 40px;
+      position: relative;
+      box-shadow: var(--shadow-lg);
     }
 
-    article>div>div:first-child {
-      float: left
+    .app-label {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
-    article>div>div:last-child {
-      float: right
+    .header {
+      margin-bottom: 30px;
     }
 
-    @media(max-width:480px) {
-      article>div>div {
-        float: none !important;
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .input-row {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 35px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 14px;
+      background: var(--card);
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1rem;
+      border-radius: 0;
+      transition: background 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      background: var(--soft);
+    }
+
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    button#main-btn {
+      flex-shrink: 0;
+      padding: 0 18px;
+      background: var(--accent);
+      border: none;
+      color: var(--accent-text);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 0;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+    }
+
+    button#main-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .results {
+      display: none;
+      gap: 24px;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-item {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 0 0 24px;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .version-tag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      padding: 0 14px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent-text);
+      border-right: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .hash-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hash-output {
+      flex: 1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      background: var(--soft);
+      padding: 12px 16px;
+      color: var(--text);
+      word-break: break-all;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      cursor: text;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .copy-btn {
+      background: var(--card);
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 1.1rem;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .copy-btn:hover {
+      color: var(--accent);
+      background: var(--soft);
+    }
+
+    .qr-wrapper {
+      display: flex;
+      justify-content: center;
+      background: white;
+      /* padding: 24px; */
+      /* border: 1px solid var(--border); */
+      border-radius: 0;
+    }
+
+    .qr-wrapper img,
+    .qr-wrapper canvas {
+      border-radius: 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--bg);
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      border-radius: 0;
+      display: none;
+      box-shadow: var(--shadow-lg);
+      font-weight: 500;
+      z-index: 1000;
+    }
+
+    @media (max-width: 640px) {
+      .results {
+        flex-direction: column;
       }
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
-    integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 </head>
 
 <body>
-  <article>
-    <center>Paste your request hash here:</center><br>
-    <input id="hash" type="text"><br>
-    <button id="calc">calculate</button>
 
-    <center><br>try the following hashes:<br></center>
+  <div class="container">
+    <div class="card">
+      <div class="app-label">NetGuard Pro</div>
 
-    <div>
-      <div id="q2">
-        <input id="hashv2"><br>
+      <div class="header">
+        <h1>Key Generator</h1>
+        <p>Enter your challenge code to generate authentication keys.</p>
       </div>
-      <div id="q3">
-        <input id="hashv3">
+
+      <div class="input-row">
+        <input type="text" id="hash" placeholder="Enter request hash (e.g. 784019874562340ghjsfdk)" autocomplete="off">
+        <button id="main-btn">Generate</button>
+      </div>
+
+      <div class="results" id="results">
+
+        <div class="result-item">
+          <div class="hash-row">
+            <div class="version-tag">v3</div>
+            <div class="hash-output" id="hashv2" onclick="selectHashText(this)"></div>
+            <button class="copy-btn" onclick="copyHash('hashv2')" title="Copy to clipboard">⧉</button>
+          </div>
+          <div class="qr-wrapper" id="q2"></div>
+        </div>
+
+        <div class="result-item">
+          <div class="hash-row">
+            <div class="version-tag">v2</div>
+            <div class="hash-output" id="hashv3" onclick="selectHashText(this)"></div>
+            <button class="copy-btn" onclick="copyHash('hashv3')" title="Copy to clipboard">⧉</button>
+          </div>
+          <div class="qr-wrapper" id="q3"></div>
+        </div>
+
       </div>
     </div>
-  </article>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard</div>
+
   <script>
-    document.getElementById("calc").addEventListener("click", (e) => {
-      e.preventDefault();
-      const hash = document.getElementById("hash").value
-      const hashv2 = CryptoJS.MD5(hash + "NetGuard3").toString();
-      const hashv3 = CryptoJS.MD5(hash + "NetGuard2").toString();
-      document.getElementById("hashv2").value = hashv2
-      document.getElementById("hashv3").value = hashv3
-      new QRCode(document.getElementById("q2"), {
-        text: hashv2,
-        width: 256,
-        height: 256,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-      new QRCode(document.getElementById("q3"), {
-        text: hashv3,
-        width: 256,
-        height: 256,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-    })
+    let toastTimeout;
+    function showToast() {
+      const t = document.getElementById("toast");
+      t.style.display = "block";
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => t.style.display = "none", 2000);
+    }
+
+    function copyHash(id) {
+      const el = document.getElementById(id);
+      if (!el.textContent) return;
+      navigator.clipboard.writeText(el.textContent).then(showToast);
+    }
+
+    function selectHashText(el) {
+      if (!el.textContent) return;
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    function generateHashes() {
+      const input = document.getElementById("hash").value.trim();
+      const resultsDiv = document.getElementById("results");
+
+      if (!input) {
+        resultsDiv.style.display = "none";
+        return;
+      }
+
+      // NetGuard3 hash maps to the "v3" logic
+      const h2 = CryptoJS.MD5(input + "NetGuard3").toString();
+      // NetGuard2 hash maps to the "v2" logic
+      const h3 = CryptoJS.MD5(input + "NetGuard2").toString();
+
+      document.getElementById("hashv2").textContent = h2;
+      document.getElementById("hashv3").textContent = h3;
+
+      const q2 = document.getElementById("q2");
+      const q3 = document.getElementById("q3");
+
+      q2.innerHTML = "";
+      q3.innerHTML = "";
+
+      // Specify correctLevel for crisp QRs
+      new QRCode(q2, { text: h2, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.L });
+      new QRCode(q3, { text: h3, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.L });
+
+      resultsDiv.style.display = "flex";
+    }
+
+    // Attach to button click
+    document.getElementById("main-btn").addEventListener("click", generateHashes);
+
+    // Attach to input field for live generation
+    document.getElementById("hash").addEventListener("input", generateHashes);
+
+    // Attach to Enter key for accessibility
+    document.getElementById("hash").addEventListener("keypress", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        generateHashes();
+      }
+    });
+
+    // Focus input on load
+    document.getElementById("hash").focus();
   </script>
+
 </body>
 
 </html>
