@@ -2,7 +2,7 @@
 
 Generate authentication keys from a NetGuard challenge code — available as a web UI, Python script, and Bash script.
 
-🌐 **Online version**: https://unamatasanatarai.github.io/netguard/
+🌐 **Online version**: https://unamatasanatarai.github.io/netguard-key-generator/
 
 ---
 
